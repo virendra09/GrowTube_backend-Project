@@ -1,5 +1,5 @@
 //reqire('dotenv').config({path:'./env'})
-
+import { app } from './app.js';
 import dotenv from 'dotenv';
 import connectDB from './db/index.js';
 
@@ -10,8 +10,16 @@ dotenv.config({
 
 
 
-
-connectDB();
+// database connection calls as asynchronously so that it will return Promises.
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT || 8000, ()=>{
+        console.log(`Server is rnnign on port :${Process.env.PORT}`)
+    } )
+})
+.catch((err)=>{
+   console.log("Mongo D connection failed in src>index.js", err)
+})
 
 
 
