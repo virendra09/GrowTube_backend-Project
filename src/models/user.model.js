@@ -55,7 +55,7 @@ const userSchema = new Schema(
 //here we should not write callback ass ()=>{}, because in arraow fun we have not the refenrence of "this"  
 userSchema.pre("save", async function(next){
     if(!this.isModified("password")) return next();
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
     next()
 })
 
