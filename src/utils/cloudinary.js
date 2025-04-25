@@ -20,8 +20,11 @@ import fs from 'fs'
                 })
 
             // file has been uploader successfull
-            console.log("file is uploaded on cloudinary", 
-            response.url)
+            // console.log("file is uploaded on cloudinary", 
+            // response.url)
+
+            //to remove files either successfully uploaded or not.
+            fs.unlinkSync(loacalFilePath)
             return response;
 
      
