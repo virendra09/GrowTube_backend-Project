@@ -31,11 +31,6 @@ const generateAccessAndRefreshTokens = async(userId)=>{
 
 
 
-
-
-
-
-
 const registerUser = asyncHandler(async (req, res)=>{
    //get user details from frontend
    //validation  not empty
@@ -70,7 +65,7 @@ const registerUser = asyncHandler(async (req, res)=>{
    if(existedUser){
     throw new ApiError(409, "User with this username or email already exixts")
    }
-
+  //console.log(req.files);
 
    //multer gives us functionality for the access of files like "req.files",
     const avatarLocalPath = req.files?.avatar[0]?.path;
@@ -198,8 +193,8 @@ const logoutUser = asyncHandler(async(req, res)=>{
    await  User.findByIdAndUpdate(
       req.user._id,
       {
-         $set:{
-          refreshToken: undefined
+         $unset:{
+          refreshToken: 1 //this removes the field from document
          }
       },
       {
@@ -403,13 +398,6 @@ const updateUserCoverImage = asyncHandler(async(req, res)=>{
 })
 
 //.......complete...............
-
-
-
-
-
-
-
 
 export {
   registerUser,
