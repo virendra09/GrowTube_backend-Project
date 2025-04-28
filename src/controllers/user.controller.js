@@ -4,6 +4,7 @@ import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import { deleteAvatar } from "../utils/deleteAvatar.js";
 
 const generateAccessAndRefreshTokens = async(userId)=>{
   try {
@@ -113,7 +114,7 @@ const registerUser = asyncHandler(async (req, res)=>{
 
 })
 
-//Login controller function
+//..........Login controller function
 const loginUser = asyncHandler(async (req, res)=>{
 
    //req body -> data
@@ -217,6 +218,8 @@ const logoutUser = asyncHandler(async(req, res)=>{
 })
 //-----Complete Logout Controller.....
 
+
+
 // To get the new access token, after access token expire time.
 const refreshAccessToken = asyncHandler(async(req, res)=>{
      const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
@@ -286,16 +289,17 @@ const changeCurrentpassword = asyncHandler(async(req, res)=>{
   .json(new ApiResponse(200, {}, "Password changed successfully"))
 })
 
-//----- Change Current Password  Controller complete.
+//-----  complete...........................
 
-// To Get Current User Controller..
+
+// To Get Current User .............
 const getCurrentUser = asyncHandler(async(req, res)=>{
   return res
   .status(200)
-  .json(200, req.user, "current user fetched successfully")
+  .json(new ApiResponse(200, req.user, "current user fetched successfully"))
 })
 
-//........Get Current User Complete......
+//........ Complete......
 
 
 // Update Account details controller
@@ -306,12 +310,12 @@ const updateAccountDetails = asyncHandler(async(req, res)=>{
     throw new ApiError(400, "All fields are required")
   }
 
- const user = User.findByIdAndUpdate(
+ const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set:{
-        fullName,
-        email
+        fullName,  //fullName : fullName
+        email      //email : email
 
       }
     },
@@ -355,6 +359,27 @@ const updateUserAvatar = asyncHandler(async(req, res)=>{
         {new : true}
        ).select("-password")
 
+
+       
+  if (!user) {
+    throw new ApiError(404, "User not found during avatar image upload.");
+  }
+
+   // Save old avatar publicId before updating
+   const oldAvatarPublicId = user.avatar?.public_id;
+
+   // Update user's avatar
+   user.avatar = {
+     public_id: avatar.public_id,
+     url: avatar.url,
+   };
+ 
+   await user.save();
+ 
+   // After saving, delete the old avatar if exists
+   if (oldAvatarPublicId) {
+     await deleteAvatar(oldAvatarPublicId);
+   }
 
        return res
        .status(200)
