@@ -115,7 +115,7 @@ const registerUser = asyncHandler(async (req, res)=>{
 
 })
 
-//..........Login controller function
+//...Login controller function.......
 const loginUser = asyncHandler(async (req, res)=>{
 
    //req body -> data
